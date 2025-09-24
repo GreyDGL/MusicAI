@@ -1,0 +1,202 @@
+Git Collaboration Guide for Music AI Project
+=============================================
+
+This guide will help you set up Git and GitHub to collaborate on the Music AI evaluation project.
+All evaluations and comments you make will be synced through GitHub so your collaborator can see them.
+
+PART 1: INSTALLING GIT
+----------------------
+
+For Mac:
+--------
+Option 1 - Using Homebrew (Recommended):
+1. First install Homebrew if you don't have it:
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+2. Install Git:
+   brew install git
+
+Option 2 - Download installer:
+1. Go to: https://git-scm.com/download/mac
+2. Download the installer
+3. Double-click and follow instructions
+
+For Windows:
+------------
+1. Go to: https://git-scm.com/download/win
+2. Download "64-bit Git for Windows Setup"
+3. Run the installer
+4. Use default settings (just keep clicking "Next")
+
+For Linux:
+----------
+Ubuntu/Debian:
+   sudo apt-get update
+   sudo apt-get install git
+
+Fedora:
+   sudo dnf install git
+
+Check if Git is installed:
+--------------------------
+Open Terminal (Mac/Linux) or Command Prompt (Windows) and type:
+   git --version
+
+You should see something like: git version 2.39.0
+
+PART 2: SETTING UP GITHUB
+--------------------------
+
+1. Create a GitHub Account:
+   - Go to https://github.com
+   - Click "Sign up"
+   - Choose a username (e.g., your name)
+   - Use your email address
+   - Create a strong password
+
+2. Configure Git with Your Information:
+   Open Terminal/Command Prompt and type these commands (replace with your info):
+
+   git config --global user.name "Your Name"
+   git config --global user.email "your-email@example.com"
+
+PART 3: CONNECTING YOUR PROJECT TO GITHUB
+------------------------------------------
+
+Step 1: Create a Repository on GitHub
+--------------------------------------
+1. Log into GitHub
+2. Click the green "New" button or go to: https://github.com/new
+3. Repository name: musicAI
+4. Description: Music AI Evaluation System
+5. Keep it "Private" if you don't want others to see it
+6. DON'T check any boxes (no README, .gitignore, or license)
+7. Click "Create repository"
+
+Step 2: Connect Your Local Project
+-----------------------------------
+Open Terminal/Command Prompt and navigate to your project folder:
+   cd /path/to/your/musicAI
+
+Then run these commands one by one:
+
+   git init
+   git add .
+   git commit -m "Initial commit of Music AI project"
+   git branch -M main
+   git remote add origin https://github.com/YOUR-USERNAME/musicAI.git
+   git push -u origin main
+
+(Replace YOUR-USERNAME with your actual GitHub username)
+
+PART 4: SYNCING EVALUATIONS AND COMMENTS
+-----------------------------------------
+
+IMPORTANT: The evaluation comments you make in the web interface are stored in the database.db file.
+To share these with your collaborator, you need to commit and push this file to GitHub.
+
+After Making Evaluations:
+-------------------------
+1. Open Terminal/Command Prompt
+2. Navigate to your project: cd /path/to/your/musicAI
+3. Run these commands:
+
+   git add database.db
+   git add music/*
+   git commit -m "Added new evaluations and music files"
+   git push
+
+Your Collaborator Getting Your Updates:
+----------------------------------------
+Your collaborator should run this command to get your latest evaluations:
+
+   git pull
+
+This will download:
+- Your database.db file with all evaluations and comments
+- Any new music files you've generated
+
+DAILY WORKFLOW
+--------------
+
+For the Person Making Evaluations:
+----------------------------------
+1. Start the application: python app.py
+2. Generate and evaluate music through the web interface
+3. When done, push your changes:
+   git add .
+   git commit -m "Evaluations from [today's date]"
+   git push
+
+For the Person Reviewing:
+-------------------------
+1. Get latest changes: git pull
+2. Start the application: python app.py
+3. View evaluations in the Dashboard or Evaluate page
+4. Can export all data using the Export button
+
+TROUBLESHOOTING
+---------------
+
+"Permission denied" when pushing:
+---------------------------------
+You might need to set up authentication:
+1. Go to GitHub Settings → Developer settings → Personal access tokens
+2. Generate a new token with "repo" permissions
+3. Use this token as your password when pushing
+
+"Merge conflict" error:
+-----------------------
+This happens if both people edited the database at the same time.
+Quick fix:
+   git pull --rebase
+   git push
+
+Can't see evaluations after pulling:
+------------------------------------
+Make sure to:
+1. Stop the application (Ctrl+C)
+2. Run git pull
+3. Restart the application: python app.py
+4. Refresh your browser
+
+SHARING WITH YOUR COLLABORATOR
+-------------------------------
+
+After setting up the GitHub repository, share these with your collaborator:
+1. The repository URL: https://github.com/YOUR-USERNAME/musicAI
+2. Add them as a collaborator:
+   - Go to your repository on GitHub
+   - Click Settings → Manage access → Add people
+   - Enter their GitHub username or email
+
+SIMPLE DAILY CHECKLIST
+----------------------
+
+Morning (Before Starting Work):
+[ ] Open Terminal
+[ ] cd /path/to/musicAI
+[ ] git pull
+[ ] python app.py
+[ ] Start evaluating
+
+Evening (After Finishing Work):
+[ ] Close the web browser
+[ ] Stop the app (Ctrl+C in Terminal)
+[ ] git add .
+[ ] git commit -m "Today's evaluations"
+[ ] git push
+[ ] Tell collaborator new evaluations are ready
+
+NOTES
+-----
+- The database.db file contains ALL evaluations and comments
+- The music/ folder contains all generated music files
+- Always pull before starting work to get latest changes
+- Always push after finishing to share your work
+- The web interface at http://localhost:8080 is only for local use
+- GitHub is used to sync the database and files between computers
+
+Need more help?
+- Git basics: https://try.github.io
+- GitHub guides: https://guides.github.com

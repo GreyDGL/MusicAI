@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Music AI Evaluation System{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>Music Evaluation Dashboard</h2>
+        <p class="text-muted">Overview of your AI-generated music library and evaluations</p>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Total Music Files</h6>
+                        <h3 class="mb-0" id="totalFiles">0</h3>
+                    </div>
+                    <i class="bi bi-music-note-list text-primary" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Total Evaluations</h6>
+                        <h3 class="mb-0" id="totalEvaluations">0</h3>
+                    </div>
+                    <i class="bi bi-clipboard-check text-success" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Pending Review</h6>
+                        <h3 class="mb-0" id="pendingReview">0</h3>
+                    </div>
+                    <i class="bi bi-hourglass-split text-warning" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Average Rating</h6>
+                        <h3 class="mb-0" id="avgRating">-</h3>
+                    </div>
+                    <i class="bi bi-star-fill text-warning" style="font-size: 2rem;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Music and Evaluations -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-clock-history"></i> Recent Music Files
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                <div id="recentMusic" class="list-group list-group-flush">
+                    <!-- Recent music will be loaded here -->
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                <a href="/evaluate" class="btn btn-sm btn-primary">
+                    <i class="bi bi-arrow-right"></i> Go to Evaluation
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-graph-up"></i> Evaluation Distribution
+            </div>
+            <div class="card-body">
+                <canvas id="ratingChart" height="150"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Top Rated Music -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-trophy"></i> Top Rated Music
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover" id="topRatedTable">
+                        <thead>
+                            <tr>
+                                <th>Filename</th>
+                                <th>Prompt</th>
+                                <th>Average Rating</th>
+                                <th>Evaluations</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topRatedBody">
+                            <!-- Top rated music will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-lightning"></i> Quick Actions
+            </div>
+            <div class="card-body">
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="/generate" class="btn btn-primary">
+                        <i class="bi bi-magic"></i> Generate New Music
+                    </a>
+                    <a href="/evaluate" class="btn btn-success">
+                        <i class="bi bi-clipboard-check"></i> Evaluate Music
+                    </a>
+                    <button class="btn btn-info" onclick="scanMusicFolder()">
+                        <i class="bi bi-arrow-clockwise"></i> Scan Music Folder
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportData()">
+                        <i class="bi bi-download"></i> Export All Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+let ratingChart = null;
+
+async function loadDashboard() {
+    try {
+        // Load music list
+        const musicResponse = await axios.get('/api/music/list');
+        const musicList = musicResponse.data;
+        
+        // Load all evaluations for statistics
+        const evalResponse = await axios.get('/api/export/evaluations');
+        const evalData = evalResponse.data;
+        
+        // Calculate statistics
+        const totalFiles = musicList.length;
+        const evaluatedFiles = musicList.filter(m => m.evaluated).length;
+        const pendingFiles = totalFiles - evaluatedFiles;
+        
+        let totalEvaluations = 0;
+        let allRatings = [];
+        let ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+        
+        evalData.music_files.forEach(file => {
+            file.evaluations.forEach(eval => {
+                totalEvaluations++;
+                if (eval.overall_rating) {
+                    allRatings.push(eval.overall_rating);
+                    ratingDistribution[eval.overall_rating]++;
+                }
+            });
+        });
+        
+        const avgRating = allRatings.length > 0 
+            ? (allRatings.reduce((a, b) => a + b, 0) / allRatings.length).toFixed(1)
+            : '-';
+        
+        // Update statistics
+        document.getElementById('totalFiles').textContent = totalFiles;
+        document.getElementById('totalEvaluations').textContent = totalEvaluations;
+        document.getElementById('pendingReview').textContent = pendingFiles;
+        document.getElementById('avgRating').textContent = avgRating;
+        
+        // Load recent music
+        const recentMusic = musicList.slice(0, 5);
+        document.getElementById('recentMusic').innerHTML = recentMusic.map(music => `
+            <a href="/evaluate" class="list-group-item list-group-item-action">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">${music.filename}</h6>
+                        <small class="text-muted">${music.prompt || 'No prompt'}</small>
+                    </div>
+                    <div>
+                        ${music.evaluated ? 
+                            `<span class="badge bg-success">Evaluated</span>` : 
+                            `<span class="badge bg-warning">Pending</span>`}
+                    </div>
+                </div>
+            </a>
+        `).join('') || '<p class="text-muted text-center">No music files yet</p>';
+        
+        // Load top rated music
+        const topRated = musicList
+            .filter(m => m.average_rating !== null)
+            .sort((a, b) => b.average_rating - a.average_rating)
+            .slice(0, 5);
+        
+        document.getElementById('topRatedBody').innerHTML = topRated.map(music => `
+            <tr>
+                <td>${music.filename}</td>
+                <td><small>${music.prompt || '-'}</small></td>
+                <td>
+                    <div class="rating-stars">
+                        ${createRatingStars(Math.round(music.average_rating))}
+                        <small class="text-muted">(${music.average_rating.toFixed(1)})</small>
+                    </div>
+                </td>
+                <td>
+                    <span class="badge bg-info">${evalData.music_files.find(f => f.id === music.id)?.evaluations.length || 0}</span>
+                </td>
+                <td><small>${new Date(music.created_at).toLocaleDateString()}</small></td>
+                <td>
+                    <a href="/evaluate" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-play"></i> Review
+                    </a>
+                </td>
+            </tr>
+        `).join('') || '<tr><td colspan="6" class="text-center text-muted">No evaluated music yet</td></tr>';
+        
+        // Update rating distribution chart
+        updateRatingChart(ratingDistribution);
+        
+    } catch (error) {
+        console.error('Failed to load dashboard:', error);
+        showToast('Failed to load dashboard data', 'danger');
+    }
+}
+
+function updateRatingChart(distribution) {
+    const ctx = document.getElementById('ratingChart').getContext('2d');
+    
+    if (ratingChart) {
+        ratingChart.destroy();
+    }
+    
+    ratingChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'],
+            datasets: [{
+                label: 'Number of Evaluations',
+                data: Object.values(distribution),
+                backgroundColor: [
+                    'rgba(220, 53, 69, 0.6)',
+                    'rgba(255, 193, 7, 0.6)',
+                    'rgba(108, 117, 125, 0.6)',
+                    'rgba(40, 167, 69, 0.6)',
+                    'rgba(74, 144, 226, 0.6)'
+                ],
+                borderColor: [
+                    'rgba(220, 53, 69, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(108, 117, 125, 1)',
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(74, 144, 226, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Initialize dashboard on load
+document.addEventListener('DOMContentLoaded', () => {
+    loadDashboard();
+    
+    // Refresh dashboard every 30 seconds
+    setInterval(loadDashboard, 30000);
+});
+</script>
+{% endblock %}

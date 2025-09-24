@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Music - Music AI Evaluation System{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-magic"></i> Music Generation with MusicGen
+            </div>
+            <div class="card-body">
+                <div class="alert alert-success">
+                    <i class="bi bi-check-circle"></i> 
+                    <strong>MusicGen Ready!</strong> The system will use Meta's MusicGen model to generate music based on your text prompts.
+                    First generation will download the model (~2.4GB for small model).
+                </div>
+                
+                <form id="generateForm">
+                    <div class="mb-4">
+                        <label for="prompt" class="form-label">Music Description Prompt</label>
+                        <textarea class="form-control" id="prompt" name="prompt" rows="3" 
+                                  placeholder="E.g., A meditative guqin solo, spacious and reflective, like flowing water" required></textarea>
+                        <small class="form-text text-muted">
+                            Describe the music you want to generate. Be specific about instruments, mood, style, and tempo.
+                        </small>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="duration" class="form-label">Duration (seconds)</label>
+                            <input type="number" class="form-control" id="duration" name="duration" 
+                                   min="1" max="30" value="10" required>
+                            <small class="form-text text-muted">1-30 seconds</small>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="temperature" class="form-label">Temperature</label>
+                            <input type="number" class="form-control" id="temperature" name="temperature" 
+                                   min="0.1" max="2.0" step="0.1" value="1.0" required>
+                            <small class="form-text text-muted">Higher = more creative</small>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label for="model" class="form-label">Model Size</label>
+                            <select class="form-control" id="model" name="model">
+                                <option value="small">Small (Fast)</option>
+                                <option value="medium" selected>Medium (Balanced)</option>
+                                <option value="large">Large (Best Quality)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-primary" id="generateBtn">
+                            <i class="bi bi-play-circle"></i> Generate Music
+                        </button>
+                        <button type="button" class="btn btn-secondary ms-2" onclick="loadExamplePrompts()">
+                            <i class="bi bi-lightbulb"></i> Example Prompts
+                        </button>
+                    </div>
+                </form>
+                
+                <div id="generationStatus" style="display: none;">
+                    <hr>
+                    <h5>Generation Status</h5>
+                    <div class="progress mb-3">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 100%">Generating...</div>
+                    </div>
+                    <p id="statusMessage" class="text-muted">Initializing MusicGen model...</p>
+                </div>
+                
+                <div id="generationResult" style="display: none;">
+                    <hr>
+                    <h5>Generation Complete!</h5>
+                    <div class="alert alert-success">
+                        <i class="bi bi-check-circle"></i> Music generated successfully!
+                    </div>
+                    <p>Your generated music has been added to the library.</p>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary" onclick="goToEvaluation()">
+                            <i class="bi bi-clipboard-check"></i> Evaluate Now
+                        </button>
+                        <button class="btn btn-secondary" onclick="generateAnother()">
+                            <i class="bi bi-arrow-clockwise"></i> Generate Another
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Example Prompts -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <i class="bi bi-card-text"></i> Example Prompts
+            </div>
+            <div class="card-body">
+                <div class="list-group" id="examplePrompts">
+                    <a href="#" class="list-group-item list-group-item-action" 
+                       onclick="usePrompt('A meditative guqin solo, spacious and reflective, like flowing water'); return false;">
+                        <strong>Guqin Meditation:</strong> A meditative guqin solo, spacious and reflective, like flowing water
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action" 
+                       onclick="usePrompt('A dramatic Beethoven-style piano sonata, full of contrast between soft and loud'); return false;">
+                        <strong>Classical Piano:</strong> A dramatic Beethoven-style piano sonata, full of contrast between soft and loud
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action" 
+                       onclick="usePrompt('Japanese koto and shakuhachi duet, each with a distinct melody line, evoking cherry blossoms in spring'); return false;">
+                        <strong>Japanese Traditional:</strong> Japanese koto and shakuhachi duet, each with a distinct melody line, evoking cherry blossoms in spring
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action" 
+                       onclick="usePrompt('Upbeat electronic dance music with heavy bass and synthesizers, 128 BPM'); return false;">
+                        <strong>Electronic Dance:</strong> Upbeat electronic dance music with heavy bass and synthesizers, 128 BPM
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action" 
+                       onclick="usePrompt('Smooth jazz saxophone solo with piano accompaniment, late night lounge atmosphere'); return false;">
+                        <strong>Jazz Lounge:</strong> Smooth jazz saxophone solo with piano accompaniment, late night lounge atmosphere
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action" 
+                       onclick="usePrompt('Celtic folk music with fiddle and bodhrán drum, lively jig rhythm'); return false;">
+                        <strong>Celtic Folk:</strong> Celtic folk music with fiddle and bodhrán drum, lively jig rhythm
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action" 
+                       onclick="usePrompt('Ambient soundscape with ethereal pads and nature sounds, peaceful and calming'); return false;">
+                        <strong>Ambient:</strong> Ambient soundscape with ethereal pads and nature sounds, peaceful and calming
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action" 
+                       onclick="usePrompt('Baroque harpsichord piece in the style of Bach, complex counterpoint'); return false;">
+                        <strong>Baroque:</strong> Baroque harpsichord piece in the style of Bach, complex counterpoint
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let generatedMusicId = null;
+
+// Handle form submission
+document.getElementById('generateForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const data = {
+        prompt: formData.get('prompt'),
+        duration: parseFloat(formData.get('duration')),
+        temperature: parseFloat(formData.get('temperature')),
+        model: formData.get('model')
+    };
+    
+    // Show generation status
+    document.getElementById('generationStatus').style.display = 'block';
+    document.getElementById('generationResult').style.display = 'none';
+    document.getElementById('generateBtn').disabled = true;
+    
+    // Update status messages
+    const statusMessages = [
+        'Initializing MusicGen model...',
+        'Processing text prompt...',
+        'Generating audio...',
+        'Applying post-processing...',
+        'Saving generated music...'
+    ];
+    
+    let messageIndex = 0;
+    const messageInterval = setInterval(() => {
+        if (messageIndex < statusMessages.length) {
+            document.getElementById('statusMessage').textContent = statusMessages[messageIndex];
+            messageIndex++;
+        }
+    }, 1000);
+    
+    try {
+        const response = await axios.post('/api/generate', data);
+        
+        clearInterval(messageInterval);
+        
+        if (response.data.success) {
+            generatedMusicId = response.data.music_id;
+            document.getElementById('generationStatus').style.display = 'none';
+            document.getElementById('generationResult').style.display = 'block';
+            showToast('Music generated successfully!', 'success');
+        } else {
+            throw new Error(response.data.message);
+        }
+    } catch (error) {
+        clearInterval(messageInterval);
+        document.getElementById('generationStatus').style.display = 'none';
+        document.getElementById('generateBtn').disabled = false;
+        
+        showToast('Generation failed: ' + (error.response?.data?.message || error.message), 'danger');
+        console.error('Generation error:', error);
+    }
+});
+
+// Use example prompt
+function usePrompt(prompt) {
+    document.getElementById('prompt').value = prompt;
+    document.getElementById('prompt').focus();
+}
+
+// Go to evaluation page
+function goToEvaluation() {
+    window.location.href = '/evaluate';
+}
+
+// Generate another
+function generateAnother() {
+    document.getElementById('generateForm').reset();
+    document.getElementById('generationResult').style.display = 'none';
+    document.getElementById('generateBtn').disabled = false;
+    generatedMusicId = null;
+}
+
+// Load example prompts (already shown in HTML)
+function loadExamplePrompts() {
+    const examplePromptsCard = document.querySelector('.card:last-child');
+    examplePromptsCard.scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,399 @@
+{% extends "base.html" %}
+
+{% block title %}Evaluate Music - Music AI Evaluation System{% endblock %}
+
+{% block extra_css %}
+<link href="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-music-note-list"></i> Music Library
+            </div>
+            <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                <div id="musicList" class="list-group">
+                    <!-- Music items will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <i class="bi bi-play-circle"></i> Now Playing
+            </div>
+            <div class="card-body">
+                <div id="playerSection" style="display: none;">
+                    <h5 id="currentFileName">Select a music file</h5>
+                    <div class="prompt-display" id="currentPrompt" style="display: none;"></div>
+                    
+                    <div class="music-player">
+                        <div id="waveform"></div>
+                        <div class="mt-3">
+                            <audio id="audioPlayer" controls style="width: 100%;"></audio>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3" id="existingEvaluations" style="display: none;">
+                        <h6>Previous Evaluations</h6>
+                        <div id="evaluationsList"></div>
+                    </div>
+                </div>
+                
+                <div id="noMusicSelected" class="text-center py-5 text-muted">
+                    <i class="bi bi-music-note-beamed" style="font-size: 3rem;"></i>
+                    <p>Select a music file from the library to begin evaluation</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3" id="evaluationFormCard" style="display: none;">
+            <div class="card-header">
+                <i class="bi bi-clipboard-check"></i> Evaluation Form
+            </div>
+            <div class="card-body evaluation-form">
+                <form id="evaluationForm">
+                    <input type="hidden" id="musicId" name="music_id">
+                    
+                    <!-- Melodic Content -->
+                    <div class="mb-4">
+                        <label class="form-label">Melodic Content</label>
+                        <div class="rating-group" data-field="melodic_content">
+                            <div class="d-flex gap-2">
+                                {% for i in range(1, 6) %}
+                                <div>
+                                    <input type="radio" id="melodic_{{ i }}" name="melodic_content" value="{{ i }}">
+                                    <label for="melodic_{{ i }}" class="star-label text-muted" style="cursor: pointer; font-size: 1.5rem;">
+                                        <i class="bi bi-star-fill"></i>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <textarea class="form-control mt-2" name="melodic_notes" placeholder="Notes on melodic content (e.g., clarity, development, thematic material)"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Instrumentation/Timbre -->
+                    <div class="mb-4">
+                        <label class="form-label">Instrumentation/Timbre Accuracy</label>
+                        <div class="rating-group" data-field="instrumentation">
+                            <div class="d-flex gap-2">
+                                {% for i in range(1, 6) %}
+                                <div>
+                                    <input type="radio" id="inst_{{ i }}" name="instrumentation" value="{{ i }}">
+                                    <label for="inst_{{ i }}" class="star-label text-muted" style="cursor: pointer; font-size: 1.5rem;">
+                                        <i class="bi bi-star-fill"></i>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <textarea class="form-control mt-2" name="instrumentation_notes" placeholder="Notes on instrumentation (e.g., authenticity, clarity, synthetic elements)"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Rhythmic Structure -->
+                    <div class="mb-4">
+                        <label class="form-label">Rhythmic Structure</label>
+                        <div class="rating-group" data-field="rhythmic_structure">
+                            <div class="d-flex gap-2">
+                                {% for i in range(1, 6) %}
+                                <div>
+                                    <input type="radio" id="rhythm_{{ i }}" name="rhythmic_structure" value="{{ i }}">
+                                    <label for="rhythm_{{ i }}" class="star-label text-muted" style="cursor: pointer; font-size: 1.5rem;">
+                                        <i class="bi bi-star-fill"></i>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <textarea class="form-control mt-2" name="rhythmic_notes" placeholder="Notes on rhythm (e.g., groove, timing, forward motion)"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Mood/Emotional Alignment -->
+                    <div class="mb-4">
+                        <label class="form-label">Mood/Emotional Alignment</label>
+                        <div class="rating-group" data-field="mood_alignment">
+                            <div class="d-flex gap-2">
+                                {% for i in range(1, 6) %}
+                                <div>
+                                    <input type="radio" id="mood_{{ i }}" name="mood_alignment" value="{{ i }}">
+                                    <label for="mood_{{ i }}" class="star-label text-muted" style="cursor: pointer; font-size: 1.5rem;">
+                                        <i class="bi bi-star-fill"></i>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <textarea class="form-control mt-2" name="mood_notes" placeholder="Notes on mood alignment (e.g., matches prompt, emotional impact)"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Audio Quality -->
+                    <div class="mb-4">
+                        <label class="form-label">Audio Quality</label>
+                        <div class="rating-group" data-field="audio_quality">
+                            <div class="d-flex gap-2">
+                                {% for i in range(1, 6) %}
+                                <div>
+                                    <input type="radio" id="quality_{{ i }}" name="audio_quality" value="{{ i }}">
+                                    <label for="quality_{{ i }}" class="star-label text-muted" style="cursor: pointer; font-size: 1.5rem;">
+                                        <i class="bi bi-star-fill"></i>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <textarea class="form-control mt-2" name="audio_notes" placeholder="Notes on audio quality (e.g., artifacts, balance, clarity)"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Overall Rating -->
+                    <div class="mb-4">
+                        <label class="form-label">Overall Rating</label>
+                        <div class="rating-group" data-field="overall_rating">
+                            <div class="d-flex gap-2">
+                                {% for i in range(1, 6) %}
+                                <div>
+                                    <input type="radio" id="overall_{{ i }}" name="overall_rating" value="{{ i }}">
+                                    <label for="overall_{{ i }}" class="star-label text-muted" style="cursor: pointer; font-size: 1.5rem;">
+                                        <i class="bi bi-star-fill"></i>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- General Comments -->
+                    <div class="mb-4">
+                        <label class="form-label">General Comments</label>
+                        <textarea class="form-control" name="comments" rows="4" placeholder="Overall impressions, suggestions, comparison to prompt expectations..."></textarea>
+                    </div>
+                    
+                    <!-- Evaluator Name -->
+                    <div class="mb-4">
+                        <label class="form-label">Evaluator Name (Optional)</label>
+                        <input type="text" class="form-control" name="evaluator_name" placeholder="Your name">
+                    </div>
+                    
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Submit Evaluation
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                            <i class="bi bi-arrow-clockwise"></i> Reset Form
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/wavesurfer.js@7"></script>
+<script>
+let currentMusicId = null;
+let wavesurfer = null;
+
+// Load music list
+async function loadMusicList() {
+    try {
+        const response = await axios.get('/api/music/list');
+        const musicList = document.getElementById('musicList');
+        
+        if (response.data.length === 0) {
+            musicList.innerHTML = '<p class="text-muted text-center">No music files found. Click "Scan Folder" to import music.</p>';
+            return;
+        }
+        
+        musicList.innerHTML = response.data.map(music => `
+            <a href="#" class="list-group-item list-group-item-action music-item" onclick="selectMusic(${music.id}); return false;">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-1">${music.filename}</h6>
+                        <small class="text-muted">${music.prompt || 'No prompt'}</small>
+                    </div>
+                    <div>
+                        ${music.evaluated ? 
+                            `<span class="badge bg-success">Evaluated</span>` : 
+                            `<span class="badge bg-warning">Pending</span>`}
+                        ${music.average_rating ? 
+                            `<div class="rating-stars small">${createRatingStars(Math.round(music.average_rating))}</div>` : ''}
+                    </div>
+                </div>
+            </a>
+        `).join('');
+    } catch (error) {
+        console.error('Failed to load music list:', error);
+        showToast('Failed to load music list', 'danger');
+    }
+}
+
+// Select music for evaluation
+async function selectMusic(musicId) {
+    currentMusicId = musicId;
+    document.getElementById('musicId').value = musicId;
+    
+    // Show player and form
+    document.getElementById('playerSection').style.display = 'block';
+    document.getElementById('noMusicSelected').style.display = 'none';
+    document.getElementById('evaluationFormCard').style.display = 'block';
+    
+    // Load music details
+    try {
+        const response = await axios.get('/api/music/list');
+        const music = response.data.find(m => m.id === musicId);
+        
+        if (music) {
+            document.getElementById('currentFileName').textContent = music.filename;
+            
+            if (music.prompt) {
+                const promptDiv = document.getElementById('currentPrompt');
+                promptDiv.innerHTML = `<strong>Prompt:</strong> ${music.prompt}`;
+                promptDiv.style.display = 'block';
+            }
+            
+            // Load audio
+            const audioPlayer = document.getElementById('audioPlayer');
+            audioPlayer.src = `/api/music/${musicId}/stream`;
+            
+            // Initialize WaveSurfer
+            if (wavesurfer) {
+                wavesurfer.destroy();
+            }
+            
+            wavesurfer = WaveSurfer.create({
+                container: '#waveform',
+                waveColor: 'rgba(255, 255, 255, 0.7)',
+                progressColor: 'rgba(255, 255, 255, 1)',
+                cursorColor: '#fff',
+                barWidth: 2,
+                barRadius: 3,
+                responsive: true,
+                height: 60,
+                normalize: true,
+                backend: 'MediaElement',
+                mediaControls: false
+            });
+            
+            wavesurfer.load(audioPlayer);
+            
+            // Sync with audio element
+            audioPlayer.addEventListener('play', () => wavesurfer.play());
+            audioPlayer.addEventListener('pause', () => wavesurfer.pause());
+            audioPlayer.addEventListener('timeupdate', () => {
+                if (wavesurfer.getDuration() > 0) {
+                    wavesurfer.seekTo(audioPlayer.currentTime / wavesurfer.getDuration());
+                }
+            });
+            
+            // Load existing evaluations
+            loadEvaluations(musicId);
+        }
+    } catch (error) {
+        console.error('Failed to load music:', error);
+        showToast('Failed to load music file', 'danger');
+    }
+}
+
+// Load existing evaluations
+async function loadEvaluations(musicId) {
+    try {
+        const response = await axios.get(`/api/evaluations/${musicId}`);
+        const evaluations = response.data;
+        
+        if (evaluations.length > 0) {
+            const evaluationsDiv = document.getElementById('existingEvaluations');
+            const evaluationsList = document.getElementById('evaluationsList');
+            
+            evaluationsList.innerHTML = evaluations.map(eval => `
+                <div class="card mb-2">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <strong>${eval.evaluator_name}</strong>
+                            <small class="text-muted">${new Date(eval.created_at).toLocaleString()}</small>
+                        </div>
+                        <div class="evaluation-summary mt-2">
+                            <div class="evaluation-metric">
+                                <div class="metric-value">${eval.overall_rating || '-'}</div>
+                                <div class="metric-label">Overall</div>
+                            </div>
+                            <div class="evaluation-metric">
+                                <div class="metric-value">${eval.melodic_content || '-'}</div>
+                                <div class="metric-label">Melodic</div>
+                            </div>
+                            <div class="evaluation-metric">
+                                <div class="metric-value">${eval.instrumentation || '-'}</div>
+                                <div class="metric-label">Timbre</div>
+                            </div>
+                            <div class="evaluation-metric">
+                                <div class="metric-value">${eval.audio_quality || '-'}</div>
+                                <div class="metric-label">Quality</div>
+                            </div>
+                        </div>
+                        ${eval.comments ? `<p class="mt-2 mb-0"><small>${eval.comments}</small></p>` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            evaluationsDiv.style.display = 'block';
+        } else {
+            document.getElementById('existingEvaluations').style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Failed to load evaluations:', error);
+    }
+}
+
+// Submit evaluation
+document.getElementById('evaluationForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(e.target);
+    const data = {
+        music_id: currentMusicId
+    };
+    
+    for (let [key, value] of formData.entries()) {
+        if (value) {
+            data[key] = value;
+        }
+    }
+    
+    try {
+        await axios.post('/api/evaluate', data);
+        showToast('Evaluation submitted successfully', 'success');
+        
+        // Reload evaluations and music list
+        loadEvaluations(currentMusicId);
+        loadMusicList();
+        
+        // Reset form
+        resetForm();
+    } catch (error) {
+        console.error('Failed to submit evaluation:', error);
+        showToast('Failed to submit evaluation', 'danger');
+    }
+});
+
+// Reset form
+function resetForm() {
+    document.getElementById('evaluationForm').reset();
+    document.querySelectorAll('.star-label').forEach(star => {
+        star.classList.remove('text-warning');
+        star.classList.add('text-muted');
+    });
+}
+
+// Initialize on page load
+window.loadMusicList = loadMusicList;
+document.addEventListener('DOMContentLoaded', () => {
+    loadMusicList();
+    setupRatingInputs();
+});
+</script>
+{% endblock %}

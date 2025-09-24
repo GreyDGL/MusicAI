@@ -1,0 +1,159 @@
+SIMPLE INSTRUCTIONS FOR SYNCING MUSIC EVALUATIONS
+==================================================
+
+This system lets you evaluate AI-generated music and share your comments with your collaborator.
+All your evaluations are automatically saved and can be synced through GitHub.
+
+WHAT YOU NEED TO KNOW
+----------------------
+- You evaluate music through a web interface (like a website)
+- Your evaluations and comments are saved in a database file
+- GitHub helps sync this database between you and your collaborator
+- Think of it like Google Drive, but for this project
+
+ONE-TIME SETUP (30 minutes)
+----------------------------
+
+Step 1: Install Git (5 minutes)
+--------------------------------
+For Mac:
+1. Open Terminal (search for "Terminal" in Spotlight)
+2. Copy and paste this command:
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+3. Press Enter and follow instructions
+4. Then type: brew install git
+
+For Windows:
+1. Go to: https://git-scm.com/download/win
+2. Download and run the installer
+3. Keep clicking "Next" (use all default options)
+
+Step 2: Create GitHub Account (5 minutes)
+------------------------------------------
+1. Go to: https://github.com
+2. Click "Sign up"
+3. Enter your email and create a password
+4. Choose a username (like your name)
+5. Verify your email
+
+Step 3: Get Access to the Project (5 minutes)
+----------------------------------------------
+Ask your collaborator to:
+1. Share the GitHub repository link with you
+2. Add you as a collaborator (they need your GitHub username)
+
+You'll get an email invitation - accept it.
+
+Step 4: Download the Project (10 minutes)
+------------------------------------------
+1. Create a folder on your computer called "MusicAI"
+2. Open Terminal (Mac) or Command Prompt (Windows)
+3. Type: cd
+4. Then drag the MusicAI folder onto the Terminal window
+5. Press Enter
+6. Copy and paste this (replace YOUR-COLLABORATOR with their GitHub username):
+   git clone https://github.com/YOUR-COLLABORATOR/musicAI.git
+7. Press Enter
+
+Step 5: Set Up Your Name (2 minutes)
+-------------------------------------
+In Terminal, type these (replace with your actual name and email):
+   git config --global user.name "Your Name"
+   git config --global user.email "your-email@example.com"
+
+DAILY USE - SUPER SIMPLE
+------------------------
+
+Starting Your Day:
+-----------------
+1. Open Terminal
+2. Type: cd and drag your MusicAI folder onto Terminal, press Enter
+3. Type: git pull (this gets any new evaluations from your collaborator)
+4. Type: python app.py
+5. Open your browser and go to: http://localhost:8080
+6. Start evaluating music!
+
+Ending Your Day:
+----------------
+1. Close your browser
+2. In Terminal, press Ctrl+C to stop the app
+3. Type these commands one by one:
+   git add .
+   git commit -m "My evaluations from today"
+   git push
+4. Tell your collaborator new evaluations are ready
+
+HOW TO EVALUATE MUSIC
+---------------------
+1. Click "Evaluate" in the menu
+2. Select a music file
+3. Listen to it
+4. Rate each aspect (1-5 stars):
+   - Melodic Content
+   - Instrumentation
+   - Rhythmic Structure
+   - Mood Alignment
+   - Audio Quality
+   - Overall Rating
+5. Add your comments in the text boxes
+6. Click "Submit Evaluation"
+
+Your comments are automatically saved!
+
+WHAT YOUR COLLABORATOR SEES
+----------------------------
+When your collaborator runs "git pull", they get:
+- All your ratings (the stars you gave)
+- All your written comments
+- Any new music files you generated
+
+They can then:
+- View your evaluations in the Dashboard
+- Export all data for analysis
+- Add their own evaluations
+
+IF SOMETHING GOES WRONG
+------------------------
+
+"Command not found" error:
+- Make sure you installed Git (Step 1)
+- Restart Terminal and try again
+
+"Permission denied" error:
+- Make sure your collaborator added you as a collaborator
+- Check you're using the right GitHub account
+
+Can't see the website:
+- Make sure you typed: python app.py
+- The website only works at: http://localhost:8080
+- Try refreshing the page
+
+Application won't start:
+- Make sure Python is installed
+- Try: python3 app.py (instead of python app.py)
+
+QUICK REFERENCE CARD
+--------------------
+Copy this and keep it handy:
+
+MORNING ROUTINE:
+cd [drag MusicAI folder here]
+git pull
+python app.py
+→ Go to http://localhost:8080
+
+EVENING ROUTINE:
+→ Press Ctrl+C in Terminal
+git add .
+git commit -m "Today's evaluations"
+git push
+
+REMEMBER
+--------
+- Always "pull" before starting (gets updates)
+- Always "push" when done (shares your work)
+- Your comments are in the database.db file
+- The music files are in the music/ folder
+- Everything syncs through GitHub automatically
+
+Questions? Check GIT_COLLABORATION_GUIDE.txt for more details!
