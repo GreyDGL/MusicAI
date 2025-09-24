@@ -1,85 +1,156 @@
 MusicAI Quick Start Guide
 =========================
 
+PREREQUISITES
+-------------
+Before starting, make sure you have:
+- Python 3.8 or higher installed
+- Git installed
+- 4GB+ RAM (8GB+ recommended)
+- GitHub account (create free at github.com)
+
 INSTALLATION
 ------------
 
-Prerequisites:
-- Python 3.8 or higher
-- Git
-- 4GB+ RAM (8GB+ recommended)
+Option A: If you received this as a ZIP file:
+----------------------------------------------
+1. Unzip the folder to your Desktop or Documents folder
 
-Quick Install:
-1. Clone the repository:
+2. Open Terminal (Mac) or Command Prompt (Windows):
+   - Mac: Press Cmd+Space, type "Terminal", press Enter
+   - Windows: Press Windows key, type "cmd", press Enter
+
+3. Navigate to the unzipped folder:
+   Type: cd
+   Then drag the MusicAI folder onto the Terminal window
+   Press Enter
+
+4. Connect this folder to GitHub (ONE-TIME SETUP):
+   git init
+   git remote add origin https://github.com/GreyDGL/MusicAI.git
+   git branch -M main
+
+   # Set up your identity (use your actual name and email):
+   git config --global user.name "Your Name"
+   git config --global user.email "your-email@example.com"
+
+5. Run the installation:
+   ./install.sh  (Mac/Linux)
+   OR
+   python install.py  (Windows)
+
+6. Start the application:
+   python app.py
+   (If that doesn't work, try: python3 app.py)
+
+7. Open your browser and go to: http://localhost:8080
+
+Option B: If cloning from GitHub directly:
+-------------------------------------------
+1. Open Terminal/Command Prompt
+2. Clone the repository:
    git clone https://github.com/GreyDGL/MusicAI.git
    cd MusicAI
+3. Continue from step 5 above
 
-2. Run the installation script:
-   ./install.sh
+DAILY USE
+---------
 
-3. Start the application:
+Starting Your Work Session:
+1. Open Terminal/Command Prompt
+2. Navigate to MusicAI folder (cd then drag folder)
+3. Get latest changes from others:
+   git pull origin main
+4. Start the app:
    python app.py
+5. Open browser to: http://localhost:8080
 
-4. Open your browser and go to: http://localhost:8080
-
+Ending Your Work Session:
+1. Close the browser tab
+2. In Terminal, press Ctrl+C to stop the app
+3. Save and share your work:
+   git add .
+   git commit -m "Added my evaluations"
+   git push origin main
 
 BASIC FEATURES
 --------------
 
-1. Generate Music
-   - Go to "Generate" in the navigation menu
-   - Enter a prompt (e.g., "A peaceful piano melody")
-   - Select model size (Small recommended for first use)
+1. Generate Music:
+   - Click "Generate" in menu
+   - Type what kind of music you want (see examples below)
+   - Choose "Small" for model size (fastest)
    - Click "Generate Music"
+   - Wait 10-30 seconds
 
-2. Evaluate Music
-   - Go to "Evaluate" tab
-   - Select a generated music file
-   - Rate various aspects (1-5 stars)
-   - Add comments
-   - Submit evaluation
+2. Evaluate Music:
+   - Click "Evaluate" in menu
+   - Select a music file
+   - Listen to it
+   - Rate each aspect with stars (1-5)
+   - Add comments if you want
+   - Click "Submit Evaluation"
 
-3. Sync with Collaborators
-   # Get latest updates
-   git pull origin main
+3. View Dashboard:
+   - Click "Dashboard" to see statistics
+   - See all evaluations
+   - Export data for analysis
 
-   # Save your evaluations
-   git add .
-   git commit -m "My evaluations"
-   git push origin main
+EXAMPLE MUSIC PROMPTS
+---------------------
+Copy and paste these to test:
+- "Happy jazz piano music"
+- "Calm meditation sounds with nature"
+- "Rock guitar solo"
+- "Classical violin piece"
+- "Electronic dance music"
 
+COMMON PROBLEMS & SOLUTIONS
+---------------------------
 
-EXAMPLE PROMPTS
+"Command not found" errors:
+- Make sure Python is installed: python --version
+- Make sure Git is installed: git --version
+- Try python3 instead of python
+
+"Permission denied" pushing to GitHub:
+- Make sure you're added as a collaborator
+- Check your GitHub username/password
+
+Application won't start:
+- Try: python3 app.py
+- Make sure you're in the MusicAI folder
+- Check that installation completed
+
+Can't see the website:
+- Make sure the app is running (green text in Terminal)
+- Try refreshing: http://localhost:8080
+- Check no other program is using port 8080
+
+QUICK REFERENCE
 ---------------
-- "Upbeat jazz piano solo"
-- "Epic orchestral battle music"
-- "Calm ambient nature sounds"
-- "90s rock with electric guitar"
+Copy and save this somewhere handy:
 
+MORNING:
+cd [drag MusicAI folder here]
+git pull origin main
+python app.py
+→ Open http://localhost:8080
 
-AVAILABLE MODELS
-----------------
-- Small (300MB): Fast, good quality
-- Medium (1.5GB): Balanced performance
-- Large (3.3GB): Best quality
-
-
-TROUBLESHOOTING
----------------
-- Application won't start: Try python3 app.py
-- Port in use: Change port in config.py
-- Memory issues: Use the Small model
-
+EVENING:
+→ Press Ctrl+C in Terminal
+git add .
+git commit -m "Today's work"
+git push origin main
 
 IMPORTANT FILES
 ---------------
-- music/ - Generated music files
-- database.db - Evaluation data
-- config.py - Settings
+- music/ folder - All generated music goes here
+- instance/database.db - All your evaluations
+- config.py - Settings (if you need to change port)
 
-
-REPOSITORY
-----------
-https://github.com/GreyDGL/MusicAI
-
-For detailed information, see README.txt
+NEED MORE HELP?
+---------------
+- See README.txt for detailed information
+- Repository: https://github.com/GreyDGL/MusicAI
+- Ask your collaborator for help with GitHub access
