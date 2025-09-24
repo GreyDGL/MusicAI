@@ -1,161 +1,241 @@
-Music AI Evaluation System
-===========================
+MusicAI - AI Music Generation & Evaluation System
+==================================================
 
-A comprehensive web-based system for evaluating AI-generated music with structured criteria based on expert feedback.
+A comprehensive web-based system for generating and evaluating AI-generated music using Meta's MusicGen model with structured evaluation criteria.
+
+REPOSITORY
+----------
+https://github.com/GreyDGL/MusicAI
+
+OVERVIEW
+--------
+MusicAI combines state-of-the-art music generation with professional evaluation tools, enabling collaborative research and assessment of AI-generated music quality.
 
 FEATURES
 --------
 
-1. Music Generation Interface
-   - Text prompt input for music generation
-   - Adjustable parameters (duration, temperature, model size)
-   - MusicGen API integration placeholder (ready for actual implementation)
-   - Example prompts for various music styles
+Music Generation:
+- Real MusicGen Integration: Uses Meta's MusicGen model for high-quality music generation
+- Multiple Model Sizes: Small (300MB), Medium (1.5GB), Large (3.3GB), and Melody variants
+- Customizable Parameters: Duration (1-30s), Temperature, Guidance Scale
+- Text-to-Music: Generate music from natural language descriptions
+- CLI Support: Generate music via command line or web interface
 
-2. Music Evaluation System
-   - Structured evaluation criteria:
-     * Melodic Content (clarity, development, thematic material)
-     * Instrumentation/Timbre Accuracy (authenticity, clarity, synthetic elements)
-     * Rhythmic Structure (groove, timing, forward motion)
-     * Mood/Emotional Alignment (matches prompt, emotional impact)
-     * Audio Quality (artifacts, balance, clarity)
-     * Overall Rating
-   - Visual audio waveform display
-   - Star rating system (1-5 scale) for each criterion
-   - Free-form comments for detailed feedback
-   - Support for multiple evaluations per music file
+Music Evaluation System:
+- Structured Criteria: Professional evaluation framework with 6 key aspects:
+  * Melodic Content (clarity, development, thematic material)
+  * Instrumentation/Timbre (authenticity, clarity, synthetic elements)
+  * Rhythmic Structure (groove, timing, forward motion)
+  * Mood/Emotional Alignment (prompt matching, emotional impact)
+  * Audio Quality (artifacts, balance, clarity)
+  * Overall Rating
+- Visual Waveform Display: Interactive audio visualization with WaveSurfer.js
+- Star Rating System: 1-5 scale for quantitative assessment
+- Detailed Comments: Free-form feedback for qualitative insights
 
-3. Dashboard
-   - Overview statistics (total files, evaluations, pending reviews, average rating)
-   - Recent music files display
-   - Top-rated music leaderboard
-   - Rating distribution visualization
-   - Quick action buttons
+Collaboration & Sync:
+- Git-Based Syncing: Share evaluations through GitHub
+- Database Synchronization: All evaluations stored in SQLite database
+- Multi-User Support: Multiple evaluators can work on the same dataset
+- Export Functionality: Export all data as JSON for analysis
 
-4. Music Library Management
-   - Automatic folder scanning for new music files
-   - Support for WAV, MP3, FLAC, M4A formats
-   - File deduplication using MD5 hashing
-   - Metadata tracking (prompt, generation parameters, timestamps)
+Dashboard & Analytics:
+- Overview Statistics: Total files, evaluations, average ratings
+- Rating Distribution: Visual charts showing rating patterns
+- Top-Rated Music: Leaderboard of best-performing generations
+- Recent Activity: Track latest evaluations and generations
 
-5. Data Export
-   - Export all evaluations as JSON
-   - Comprehensive data structure with all metrics and comments
-   - Ready for analysis and reporting
+PREREQUISITES
+-------------
+- Python 3.8 or higher
+- Git
+- 4GB+ RAM (8GB+ recommended for Medium/Large models)
+- macOS, Linux, or Windows
+- ~10GB free disk space (for model downloads)
 
 INSTALLATION
 ------------
 
-1. Install dependencies:
-   pip install -r requirements.txt
+Automated Installation (Recommended):
+1. Clone the repository:
+   git clone https://github.com/GreyDGL/MusicAI.git
+   cd MusicAI
 
-2. Run the application:
+2. Run installation script:
+   ./install.sh  (macOS/Linux)
+   OR
+   python install.py  (Windows)
+
+3. Start the application:
    python app.py
 
-3. Access the application at: http://localhost:8080
+Manual Installation:
+1. Clone repository:
+   git clone https://github.com/GreyDGL/MusicAI.git
+   cd MusicAI
+
+2. Create virtual environment:
+   python -m venv venv
+   source venv/bin/activate  (macOS/Linux)
+   OR
+   venv\Scripts\activate  (Windows)
+
+3. Install dependencies:
+   pip install -r requirements.txt
+   pip install -r requirements_musicgen.txt
+
+4. Start application:
+   python app.py
 
 USAGE
 -----
 
-Quick Start:
-1. Click "Scan Folder" to import existing music files from the music/ directory
-2. Go to "Evaluate" to listen to and evaluate music
-3. Use "Generate" to create new music (currently uses placeholder)
-4. View statistics and trends on the Dashboard
-5. Export evaluation data using the Export button
+Web Interface:
+1. Start the application: python app.py
+2. Open browser: http://localhost:8080
+3. Navigate through tabs:
+   - Generate: Create new music from text prompts
+   - Evaluate: Listen and evaluate music files
+   - Dashboard: View statistics and analytics
+   - Export: Download evaluation data
 
-Evaluation Process:
-1. Select a music file from the library
-2. Listen to the audio with visual waveform
-3. Rate each criterion on a 1-5 scale
-4. Add detailed notes for each criterion
-5. Provide overall comments
-6. Submit evaluation
+Command Line Interface:
+   # Generate music
+   python musicgen_cli.py "A peaceful piano melody"
 
-Music Generation (Placeholder):
-The system includes a placeholder for MusicGen integration. To connect actual MusicGen:
-1. Install the audiocraft library
-2. Update musicgen_api.py with actual MusicGen model calls
-3. The interface is already prepared for real generation
+   # With options
+   python musicgen_cli.py "Epic orchestral music" --duration 15 --model medium
 
-FILE STRUCTURE
---------------
+   # List available models
+   python musicgen_cli.py --list-models
 
-musicAI/
-├── app.py                 # Main Flask application
-├── models.py             # Database models
-├── musicgen_api.py       # MusicGen integration (placeholder)
-├── requirements.txt      # Python dependencies
-├── music/                # Music files storage
-├── static/
+Git Synchronization:
+   # Get latest updates
+   git pull origin main
+
+   # Save your work
+   git add .
+   git commit -m "Added evaluations for jazz pieces"
+   git push origin main
+
+PROJECT STRUCTURE
+-----------------
+MusicAI/
+├── app.py                    # Main Flask application
+├── models.py                 # Database models (SQLAlchemy)
+├── config.py                 # Configuration settings
+├── musicgen_api.py          # MusicGen integration
+├── musicgen_cli.py          # CLI for music generation
+├── requirements.txt         # Python dependencies
+├── requirements_musicgen.txt # MusicGen dependencies
+├── install.sh               # Installation script
+├── cleanup.sh               # Cleanup utility
+├── run.sh                   # Launch script
+├── music/                   # Generated music storage
+├── instance/               # Instance-specific files
+│   └── database.db        # SQLite database
+├── static/                 # Frontend assets
 │   ├── css/
-│   │   └── style.css    # Custom styles
+│   │   └── style.css
 │   └── js/
-│       └── main.js      # Frontend JavaScript
-├── templates/
-│   ├── base.html        # Base template
-│   ├── index.html       # Dashboard
-│   ├── generate.html    # Music generation
-│   └── evaluate.html    # Evaluation interface
-└── database.db          # SQLite database
+│       └── main.js
+└── templates/              # HTML templates
+    ├── base.html
+    ├── index.html         # Dashboard
+    ├── generate.html      # Generation interface
+    └── evaluate.html      # Evaluation interface
 
-API ENDPOINTS
+CONFIGURATION
 -------------
 
-- GET /                      - Dashboard
-- GET /generate             - Generation interface
-- GET /evaluate             - Evaluation interface
-- GET /api/music/list       - List all music files
-- GET /api/music/scan       - Scan folder for new music
-- GET /api/music/<id>/stream - Stream music file
-- POST /api/generate        - Generate new music (placeholder)
-- POST /api/evaluate        - Submit evaluation
-- GET /api/evaluations/<music_id> - Get evaluations for a music file
-- GET /api/export/evaluations - Export all evaluation data
+config.py Settings:
+- PORT: Application port (default: 8080)
+- MUSIC_FOLDER: Music storage location
+- DATABASE_URL: Database connection
+- MAX_DURATION: Maximum generation duration
+- DEFAULT_MODEL: Default MusicGen model size
 
-DATABASE SCHEMA
+Model Performance:
++--------+-------+-----------+-----------------+---------+
+| Model  | Size  | RAM Usage | Generation Time | Quality |
++--------+-------+-----------+-----------------+---------+
+| Small  | 300MB | ~2GB      | 10-20s          | Good    |
+| Medium | 1.5GB | ~6GB      | 20-40s          | Better  |
+| Large  | 3.3GB | ~12GB     | 30-60s          | Best    |
++--------+-------+-----------+-----------------+---------+
+
+EXAMPLE PROMPTS
+---------------
+- "Upbeat jazz piano with walking bass line"
+- "Cinematic orchestral piece with strings and brass"
+- "Lo-fi hip hop beat for studying"
+- "Classical guitar with Spanish influences"
+- "Ambient electronic with nature sounds"
+- "90s rock anthem with power chords"
+- "Smooth R&B with soul vocals feel"
+- "Traditional Japanese music with koto and flute"
+
+TROUBLESHOOTING
 ---------------
 
-MusicFile Table:
-- id (Primary Key)
-- filename
-- filepath
-- file_hash (MD5, unique)
-- prompt
-- generation_params (JSON)
-- created_at
+Common Issues:
+- Port already in use: Change PORT in config.py
+- Memory errors: Use smaller model or reduce duration
+- Model download fails: Check internet connection and disk space
+- Can't find Python: Use python3 instead of python
+- Permission denied: Run with appropriate permissions or check file ownership
 
-Evaluation Table:
-- id (Primary Key)
-- music_id (Foreign Key)
-- melodic_content (1-5)
-- melodic_notes (text)
-- instrumentation (1-5)
-- instrumentation_notes (text)
-- rhythmic_structure (1-5)
-- rhythmic_notes (text)
-- mood_alignment (1-5)
-- mood_notes (text)
-- audio_quality (1-5)
-- audio_notes (text)
-- overall_rating (1-5)
-- comments (text)
-- evaluator_name
-- created_at
+Reset & Cleanup:
+   # Clean up and reset
+   ./cleanup.sh
 
-TECHNOLOGIES USED
------------------
-- Backend: Flask, SQLAlchemy, Flask-Migrate
-- Frontend: Bootstrap 5, WaveSurfer.js, Chart.js
-- Database: SQLite
-- Audio Processing: librosa (ready for analysis features)
+   # Remove models cache
+   rm -rf ~/.cache/huggingface/hub/
 
-FUTURE ENHANCEMENTS
+COLLABORATION GUIDE
 -------------------
-- Real MusicGen integration
-- Batch evaluation mode
-- User authentication
-- Advanced audio analysis features
-- CSV export option
-- Comparison view for multiple evaluations
-- Automated quality metrics
+
+For Project Owner:
+1. Create GitHub repository
+2. Push initial code
+3. Add collaborators in Settings → Manage access
+4. Share repository URL
+
+For Collaborators:
+1. Accept GitHub invitation
+2. Clone repository
+3. Make evaluations
+4. Commit and push changes
+5. Pull updates regularly
+
+DEVELOPMENT
+-----------
+
+API Endpoints:
+- GET / - Dashboard
+- GET /generate - Generation page
+- GET /evaluate - Evaluation page
+- POST /api/generate - Generate music
+- POST /api/evaluate - Submit evaluation
+- GET /api/music/list - List music files
+- GET /api/music/<id>/stream - Stream audio
+- GET /api/export/evaluations - Export data
+
+Database Schema:
+- MusicFile: Stores generated music metadata
+- Evaluation: Stores evaluation data and ratings
+
+LICENSE
+-------
+This project uses open-source components including Meta's MusicGen model.
+
+ACKNOWLEDGMENTS
+---------------
+- Meta AI for MusicGen model
+- Flask community for web framework
+- Bootstrap for UI components
+- WaveSurfer.js for audio visualization
+
+SUPPORT
+-------
+For issues or questions, please open an issue at: https://github.com/GreyDGL/MusicAI/issues
